@@ -135,6 +135,7 @@ More detail: [docs/DOCKER.md](docs/DOCKER.md)
 
 <div align="center">
 
+<img width="600" height="auto" alt="forge_saas_architecture" src="https://github.com/user-attachments/assets/c848701d-62ee-48a3-bc09-24f07ca85fab" />
 </div>
 
 ---
