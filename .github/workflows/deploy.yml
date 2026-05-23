@@ -1,10 +1,22 @@
-name: CI/CD
+name: Deploy to AWS
+
+# Manual deploy only — run from GitHub Actions tab when AWS OIDC + secrets are configured.
+# CI (tests) runs automatically via ci.yml on push/PR to main.
 
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: GitHub Environment to use
+        required: true
+        default: production
+        type: choice
+        options:
+          - production
+      image_tag:
+        description: Docker image tag (default = commit SHA)
+        required: false
+        type: string
 
 env:
   AWS_REGION: us-east-1
@@ -15,57 +27,22 @@ permissions:
   contents: read
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:15-alpine
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: dev
-          POSTGRES_DB: forge_test
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    environment: ${{ inputs.environment }}
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Verify required secrets
+        run: |
+          if [ -z "${{ secrets.AWS_ROLE_ARN }}" ]; then
+            echo "::error::Missing secret AWS_ROLE_ARN. See docs/DEPLOYMENT.md"
+            exit 1
+          fi
+          if [ -z "${{ secrets.DB_PASSWORD }}" ]; then
+            echo "::error::Missing secret DB_PASSWORD"
+            exit 1
+          fi
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-          cache-dependency-path: backend/package-lock.json
-
-      - name: Install backend dependencies
-        working-directory: backend
-        run: npm install
-
-      - name: Run unit tests
-        working-directory: backend
-        run: npm test -- --passWithNoTests
-
-      - name: Run E2E tests
-        working-directory: backend
-        env:
-          DATABASE_URL: postgresql://postgres:dev@localhost:5432/forge_test
-          JWT_SECRET: test-jwt-secret
-          REFRESH_SECRET: test-refresh-secret
-          FRONTEND_URL: http://localhost:5173
-          ENVIRONMENT: test
-        run: npm run test:e2e
-
-  build-and-deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-    environment: production
-
-    steps:
       - uses: actions/checkout@v4
 
       - uses: aws-actions/configure-aws-credentials@v4
@@ -79,7 +56,7 @@ jobs:
       - name: Build and push API image
         env:
           ECR_REGISTRY: ${{ steps.ecr.outputs.registry }}
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: ${{ inputs.image_tag || github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG ./backend
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -92,7 +69,7 @@ jobs:
         working-directory: infra/terraform
         env:
           TF_VAR_db_password: ${{ secrets.DB_PASSWORD }}
-          TF_VAR_api_image: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+          TF_VAR_api_image: ${{ steps.ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ inputs.image_tag || github.sha }}
           TF_VAR_frontend_url: ${{ vars.FRONTEND_URL }}
         run: |
           terraform init

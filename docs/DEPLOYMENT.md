@@ -53,14 +53,29 @@ Update AWS Secrets Manager secret `${project}/${environment}/app` with real valu
 
 ## CI/CD
 
-GitHub Actions workflow `.github/workflows/deploy.yml`:
+Two workflows in `.github/workflows/`:
 
-- **PR/push**: unit + E2E tests with Postgres service
-- **main push**: build Docker → ECR → `terraform apply`
+| Workflow | Trigger | What it does |
+|----------|---------|----------------|
+| **`ci.yml`** | Push / PR to `main` | Unit + E2E tests (Postgres service). No AWS required. |
+| **`deploy.yml`** | **Manual only** (`workflow_dispatch`) | Build image → ECR → `terraform apply` |
 
-Required secrets: `AWS_ROLE_ARN`, `DB_PASSWORD`, Stripe keys.
+### Run CI locally (same as GitHub)
 
-Required variable: `FRONTEND_URL`.
+```bash
+cd backend && npm test && npm run test:e2e
+```
+
+### Deploy manually (when AWS is ready)
+
+1. Configure OIDC role + GitHub secrets (below).
+2. GitHub → **Actions** → **Deploy to AWS** → **Run workflow**.
+
+Required **secrets**: `AWS_ROLE_ARN`, `DB_PASSWORD`.
+
+Required **variable**: `FRONTEND_URL` (repository or `production` environment).
+
+Optional: create GitHub Environment `production` with required reviewers.
 
 ## Production checklist
 

@@ -54,7 +54,7 @@ Start a SaaS in a weekend with production patterns: row-level multi-tenancy, JWT
 | **Cache** | Redis (local / rate-limit ready) | Redis 7 |
 | **Metrics** | Prometheus (`/metrics`) | prom-client 15 |
 | **Deploy** | Docker → ECR → ECS + RDS + ALB | Terraform |
-| **CI/CD** | GitHub Actions | test + build + deploy |
+| **CI/CD** | GitHub Actions | CI on push/PR · deploy manual |
 
 ---
 
@@ -132,28 +132,9 @@ More detail: [docs/DOCKER.md](docs/DOCKER.md)
 
 ## Architecture
 
-```
-┌─────────────────────────────────────┐
-│        React Frontend               │
-│   Auth · Dashboard · Billing        │
-└────────────┬────────────────────────┘
-             │ REST /api
-┌────────────▼────────────────────────┐
-│       NestJS Backend                │
-│   JWT · RBAC · Tenant isolation     │
-│   Stripe · Prometheus metrics       │
-└────────────┬────────────────────────┘
-             │
-     ┌───────┴───────┐
-     ▼               ▼
- PostgreSQL       Redis
- (row-level         (local)
-  tenant_id)
-
-Production: Docker → ECR → ECS Fargate
-             ALB → RDS PostgreSQL
-             Secrets Manager · CloudWatch
-```
+<p align="center">
+  <img src="docs/assets/forge-architecture.png" alt="Forge SaaS architecture: React frontend, NestJS API, PostgreSQL, Redis, and AWS production deployment" width="100%" />
+</p>
 
 ---
 
@@ -182,7 +163,7 @@ forge/
 ├── insomnia/                # Insomnia collection (import JSON)
 ├── docker-compose.yml       # full local stack
 ├── Makefile
-└── .github/workflows/       # CI/CD
+└── .github/workflows/       # ci.yml (auto) · deploy.yml (manual)
 ```
 
 ---
