@@ -1,8 +1,9 @@
 <div align="center">
-
+  
 # Forge
 
-<img width="150" height="150" alt="Forge logo" src="docs/assets/forge-icon.png" />
+<img width="150" height="150" alt="forge_triangle_icon" src="https://github.com/user-attachments/assets/443b6ca5-5fb1-477d-97a5-b780b1275d2a" />
+
 
 ### SaaS Starter Kit
 
@@ -132,9 +133,9 @@ More detail: [docs/DOCKER.md](docs/DOCKER.md)
 
 ## Architecture
 
-<p align="center">
-  <img src="docs/assets/forge-architecture.svg" alt="Forge SaaS architecture: React frontend, NestJS API, PostgreSQL, Redis, and AWS production deployment" width="100%" />
-</p>
+<div align="center">
+
+</div>
 
 ---
 
