@@ -133,7 +133,7 @@ More detail: [docs/DOCKER.md](docs/DOCKER.md)
 ## Architecture
 
 <p align="center">
-  <img src="docs/assets/forge-architecture.png" alt="Forge SaaS architecture: React frontend, NestJS API, PostgreSQL, Redis, and AWS production deployment" width="100%" />
+  <img src="docs/assets/forge-architecture.svg" alt="Forge SaaS architecture: React frontend, NestJS API, PostgreSQL, Redis, and AWS production deployment" width="100%" />
 </p>
 
 ---
