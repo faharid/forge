@@ -1,0 +1,556 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2026-05-23T00:00:00.000Z",
+  "__export_source": "forge",
+  "resources": [
+    {
+      "_id": "wrk_forge_api",
+      "_type": "workspace",
+      "parentId": null,
+      "name": "Forge API",
+      "description": "SaaS starter kit — NestJS multi-tenant API.\n\n1. Run **Auth → Login** or **Signup**\n2. Copy `accessToken` / `refreshToken` into environment (or use response script on login)\n3. Call protected routes with Bearer token",
+      "scope": "collection"
+    },
+    {
+      "_id": "env_forge_base",
+      "_type": "environment",
+      "parentId": "wrk_forge_api",
+      "name": "Local",
+      "data": {
+        "base_url": "http://localhost:3001/api",
+        "metrics_base": "http://localhost:3001",
+        "access_token": "",
+        "refresh_token": "",
+        "user_id": "",
+        "tenant_id": ""
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "metrics_base",
+          "access_token",
+          "refresh_token",
+          "user_id",
+          "tenant_id"
+        ]
+      },
+      "color": "#6366f1",
+      "isPrivate": false,
+      "metaSortKey": 1000000000000
+    },
+    {
+      "_id": "env_forge_docker",
+      "_type": "environment",
+      "parentId": "env_forge_base",
+      "name": "Docker (frontend :3000)",
+      "data": {
+        "base_url": "http://localhost:3001/api",
+        "metrics_base": "http://localhost:3001"
+      },
+      "dataPropertyOrder": {
+        "&": ["base_url", "metrics_base"]
+      },
+      "color": "#22c55e",
+      "isPrivate": false,
+      "metaSortKey": 1000000000001
+    },
+    {
+      "_id": "fld_auth",
+      "_type": "request_group",
+      "parentId": "wrk_forge_api",
+      "name": "Auth",
+      "description": "Public authentication endpoints",
+      "metaSortKey": -1000000000000
+    },
+    {
+      "_id": "fld_users",
+      "_type": "request_group",
+      "parentId": "wrk_forge_api",
+      "name": "Users",
+      "description": "Requires Bearer token. POST/DELETE require admin role.",
+      "metaSortKey": -900000000000
+    },
+    {
+      "_id": "fld_tenants",
+      "_type": "request_group",
+      "parentId": "wrk_forge_api",
+      "name": "Tenants",
+      "description": "Current workspace (tenant) settings",
+      "metaSortKey": -800000000000
+    },
+    {
+      "_id": "fld_billing",
+      "_type": "request_group",
+      "parentId": "wrk_forge_api",
+      "name": "Billing",
+      "description": "Stripe Checkout, Portal, webhooks",
+      "metaSortKey": -700000000000
+    },
+    {
+      "_id": "fld_ops",
+      "_type": "request_group",
+      "parentId": "wrk_forge_api",
+      "name": "Health & Metrics",
+      "description": "Observability (no auth)",
+      "metaSortKey": -600000000000
+    },
+    {
+      "_id": "req_auth_signup",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Signup",
+      "description": "Creates tenant + admin user. Save tokens from response.",
+      "url": "{{ _.base_url }}/auth/signup",
+      "method": "POST",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json", "id": "pair_signup_ct" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"admin@acme.dev\",\n  \"password\": \"password123\",\n  \"tenantName\": \"Acme Inc\"\n}"
+      },
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -1000000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_auth_login",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Login",
+      "description": "Returns accessToken + refreshToken. Set environment vars after response.",
+      "url": "{{ _.base_url }}/auth/login",
+      "method": "POST",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json", "id": "pair_login_ct" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"admin@acme.dev\",\n  \"password\": \"password123\"\n}"
+      },
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -999999999999,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_auth_refresh",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Refresh token",
+      "url": "{{ _.base_url }}/auth/refresh",
+      "method": "POST",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json", "id": "pair_refresh_ct" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"refreshToken\": \"{{ _.refresh_token }}\"\n}"
+      },
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -999999999998,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_auth_logout",
+      "_type": "request",
+      "parentId": "fld_auth",
+      "name": "Logout",
+      "url": "{{ _.base_url }}/auth/logout",
+      "method": "POST",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_logout_auth" }
+      ],
+      "body": {},
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -999999999997,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_users_list",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "List users",
+      "url": "{{ _.base_url }}/users",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_users_list_auth" }
+      ],
+      "body": {},
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -900000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_users_get",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Get user by ID",
+      "url": "{{ _.base_url }}/users/{{ _.user_id }}",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_users_get_auth" }
+      ],
+      "body": {},
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -899999999999,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_users_create",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Create user (admin)",
+      "url": "{{ _.base_url }}/users",
+      "method": "POST",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_users_create_auth" },
+        { "name": "Content-Type", "value": "application/json", "id": "pair_users_create_ct" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"member@example.com\",\n  \"password\": \"password123\",\n  \"role\": \"member\"\n}"
+      },
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -899999999998,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_users_update",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Update user (admin)",
+      "url": "{{ _.base_url }}/users/{{ _.user_id }}",
+      "method": "PUT",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_users_update_auth" },
+        { "name": "Content-Type", "value": "application/json", "id": "pair_users_update_ct" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"role\": \"member\"\n}"
+      },
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -899999999997,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_users_delete",
+      "_type": "request",
+      "parentId": "fld_users",
+      "name": "Delete user (admin)",
+      "url": "{{ _.base_url }}/users/{{ _.user_id }}",
+      "method": "DELETE",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_users_delete_auth" }
+      ],
+      "body": {},
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -899999999996,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_tenants_me",
+      "_type": "request",
+      "parentId": "fld_tenants",
+      "name": "Get current tenant",
+      "url": "{{ _.base_url }}/tenants/me",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_tenants_me_auth" }
+      ],
+      "body": {},
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -800000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_tenants_update",
+      "_type": "request",
+      "parentId": "fld_tenants",
+      "name": "Update current tenant",
+      "url": "{{ _.base_url }}/tenants/me",
+      "method": "PUT",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_tenants_update_auth" },
+        { "name": "Content-Type", "value": "application/json", "id": "pair_tenants_update_ct" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"name\": \"Acme Corporation\"\n}"
+      },
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -799999999999,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_tenants_invite",
+      "_type": "request",
+      "parentId": "fld_tenants",
+      "name": "Invite user (admin)",
+      "description": "Invite link is logged in API container stdout in dev.",
+      "url": "{{ _.base_url }}/tenants/me/invite",
+      "method": "POST",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_tenants_invite_auth" },
+        { "name": "Content-Type", "value": "application/json", "id": "pair_tenants_invite_ct" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"email\": \"colleague@example.com\"\n}"
+      },
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -799999999998,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_billing_subscription",
+      "_type": "request",
+      "parentId": "fld_billing",
+      "name": "Get subscription",
+      "url": "{{ _.base_url }}/billing/subscription",
+      "method": "GET",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_billing_sub_auth" }
+      ],
+      "body": {},
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -700000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_billing_checkout_starter",
+      "_type": "request",
+      "parentId": "fld_billing",
+      "name": "Checkout — Starter (admin)",
+      "description": "Requires STRIPE_SECRET_KEY. Returns { url } for redirect.",
+      "url": "{{ _.base_url }}/billing/checkout",
+      "method": "POST",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_billing_co_auth" },
+        { "name": "Content-Type", "value": "application/json", "id": "pair_billing_co_ct" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"plan\": \"starter\"\n}"
+      },
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -699999999999,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_billing_checkout_pro",
+      "_type": "request",
+      "parentId": "fld_billing",
+      "name": "Checkout — Pro (admin)",
+      "url": "{{ _.base_url }}/billing/checkout",
+      "method": "POST",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_billing_co_pro_auth" },
+        { "name": "Content-Type", "value": "application/json", "id": "pair_billing_co_pro_ct" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"plan\": \"pro\"\n}"
+      },
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -699999999998,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_billing_portal",
+      "_type": "request",
+      "parentId": "fld_billing",
+      "name": "Customer portal (admin)",
+      "description": "Stripe Customer Portal session URL.",
+      "url": "{{ _.base_url }}/billing/portal",
+      "method": "POST",
+      "headers": [
+        { "name": "Authorization", "value": "Bearer {{ _.access_token }}", "id": "pair_billing_portal_auth" }
+      ],
+      "body": {},
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -699999999997,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_billing_webhook",
+      "_type": "request",
+      "parentId": "fld_billing",
+      "name": "Webhook (Stripe)",
+      "description": "Use Stripe CLI: stripe listen --forward-to localhost:3001/api/billing/webhook\nSet header Stripe-Signature from CLI output.",
+      "url": "{{ _.base_url }}/billing/webhook",
+      "method": "POST",
+      "headers": [
+        { "name": "Content-Type", "value": "application/json", "id": "pair_webhook_ct" },
+        { "name": "Stripe-Signature", "value": "whsec_replace_me", "id": "pair_webhook_sig" }
+      ],
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"type\": \"checkout.session.completed\",\n  \"data\": {\n    \"object\": {}\n  }\n}"
+      },
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -699999999996,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_health",
+      "_type": "request",
+      "parentId": "fld_ops",
+      "name": "Health check",
+      "url": "{{ _.base_url }}/health",
+      "method": "GET",
+      "headers": [],
+      "body": {},
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -600000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_metrics",
+      "_type": "request",
+      "parentId": "fld_ops",
+      "name": "Prometheus metrics",
+      "url": "{{ _.metrics_base }}/metrics",
+      "method": "GET",
+      "headers": [],
+      "body": {},
+      "parameters": [],
+      "authentication": {},
+      "metaSortKey": -599999999999,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    }
+  ]
+}

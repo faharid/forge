@@ -1,0 +1,12 @@
+aws_region          = "us-east-1"
+project_name        = "forge"
+environment         = "staging"
+db_password         = "CHANGE_ME_STRONG_PASSWORD"
+db_instance_class   = "db.t4g.micro"
+ecs_cpu             = 256
+ecs_memory          = 512
+ecs_desired_count   = 2
+api_image           = "123456789012.dkr.ecr.us-east-1.amazonaws.com/forge-api:latest"
+frontend_url        = "https://app.yourdomain.com"
+acm_certificate_arn = ""
+domain_name         = ""

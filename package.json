@@ -1,0 +1,23 @@
+{
+  "name": "forge",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-ready SaaS starter kit",
+  "scripts": {
+    "dev": "concurrently -n api,web -c blue,green \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "build": "npm run build --prefix backend && npm run build --prefix frontend",
+    "test": "npm run test --prefix backend",
+    "test:e2e": "npm run test:e2e --prefix backend",
+    "migration:run": "npm run migration:run --prefix backend",
+    "seed": "npm run seed --prefix backend",
+    "seed:fresh": "npm run seed:fresh --prefix backend",
+    "docker:up": "docker compose up -d --build",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
